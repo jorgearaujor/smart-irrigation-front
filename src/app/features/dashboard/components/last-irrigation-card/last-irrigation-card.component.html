@@ -1,0 +1,36 @@
+<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+  <h2 class="text-lg font-bold tracking-tight">Última Irrigação</h2>
+
+  @if (loading()) {
+    <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Carregando...</p>
+  } @else if (lastRecord(); as record) {
+    <dl class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Data</dt>
+        <dd class="text-base font-bold">{{ record.data }} {{ record.hora }}</dd>
+      </div>
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Duração</dt>
+        <dd class="text-base font-bold">{{ record.tempo }}</dd>
+      </div>
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Modo</dt>
+        <dd class="text-base font-bold capitalize">{{ record.modo }}</dd>
+      </div>
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Vol. por planta</dt>
+        <dd class="text-base font-bold">{{ record.volumePorPlanta }} L</dd>
+      </div>
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Vol. total</dt>
+        <dd class="text-base font-bold">{{ record.volumeTotal }} L</dd>
+      </div>
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Umidade antes</dt>
+        <dd class="text-base font-bold">{{ record.umidadeAtual }}%</dd>
+      </div>
+    </dl>
+  } @else {
+    <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Nenhum registro de irrigação nos últimos 30 dias.</p>
+  }
+</div>

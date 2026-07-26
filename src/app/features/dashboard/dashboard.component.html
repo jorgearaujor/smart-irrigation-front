@@ -1,0 +1,42 @@
+<div class="flex flex-col gap-6">
+  <app-status-header />
+
+  <div class="flex gap-2 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:w-fit">
+    <button
+      type="button"
+      (click)="setMode('manual')"
+      [disabled]="changingMode()"
+      [class]="
+        irrigation.isManual()
+          ? 'flex-1 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm sm:flex-none'
+          : 'flex-1 rounded-xl px-6 py-2.5 text-sm font-bold text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 sm:flex-none'
+      "
+    >
+      Manual
+    </button>
+    <button
+      type="button"
+      (click)="setMode('automatico')"
+      [disabled]="changingMode()"
+      [class]="
+        !irrigation.isManual()
+          ? 'flex-1 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm sm:flex-none'
+          : 'flex-1 rounded-xl px-6 py-2.5 text-sm font-bold text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 sm:flex-none'
+      "
+    >
+      Automático
+    </button>
+  </div>
+
+  <app-sensor-snapshot-card />
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    @if (irrigation.isManual()) {
+      <app-manual-control-card />
+    } @else {
+      <app-auto-authorization-card />
+    }
+
+    <app-last-irrigation-card />
+  </div>
+</div>

@@ -1,0 +1,59 @@
+<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+  <h2 class="text-lg font-bold tracking-tight">Cultura</h2>
+  <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+    Cultura cadastrada e fase de crescimento atual, usadas para determinar o coeficiente de cultura (Kc).
+  </p>
+
+  @if (form(); as f) {
+    <div class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <label class="block">
+        <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Cultura</span>
+        <select
+          [ngModel]="f.cultura"
+          (ngModelChange)="updateField('cultura', $event)"
+          class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
+        >
+          @for (cultura of culturas(); track cultura.nome) {
+            <option [value]="cultura.nome">{{ cultura.nome }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="block">
+        <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Fase de crescimento</span>
+        <select
+          [ngModel]="f.faseCrescimento"
+          (ngModelChange)="updateField('faseCrescimento', $event)"
+          class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
+        >
+          @for (fase of fases; track fase) {
+            <option [ngValue]="fase">Fase {{ fase }}</option>
+          }
+        </select>
+      </label>
+
+      <div class="block sm:col-span-2">
+        <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Coeficiente de cultura (Kc) calculado</span>
+        <p class="mt-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-base font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200">
+          {{ kcAtual() ?? '--' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-5 flex items-center gap-3">
+      <button
+        type="button"
+        (click)="save()"
+        [disabled]="saving()"
+        class="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-slate-700 disabled:opacity-60 dark:bg-emerald-600 dark:hover:bg-emerald-700"
+      >
+        {{ saving() ? 'Salvando...' : 'Salvar Cultura' }}
+      </button>
+      @if (saved()) {
+        <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Cultura atualizada ✓</span>
+      }
+    </div>
+  } @else {
+    <p class="mt-5 text-sm text-slate-500 dark:text-slate-400">Carregando...</p>
+  }
+</div>

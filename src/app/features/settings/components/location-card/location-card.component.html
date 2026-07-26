@@ -1,0 +1,32 @@
+<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+  <h2 class="text-lg font-bold tracking-tight">Localização</h2>
+  <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+    Latitude do sistema, usada nos cálculos de evapotranspiração baseados na posição solar.
+  </p>
+
+  <label class="mt-5 block max-w-xs">
+    <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Latitude do sistema</span>
+    <input
+      type="number"
+      step="0.0001"
+      [ngModel]="latitude()"
+      (ngModelChange)="updateLatitude($event)"
+      placeholder="Ex: -23.5505"
+      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
+    />
+  </label>
+
+  <div class="mt-5 flex items-center gap-3">
+    <button
+      type="button"
+      (click)="save()"
+      [disabled]="saving()"
+      class="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-slate-700 disabled:opacity-60 dark:bg-emerald-600 dark:hover:bg-emerald-700"
+    >
+      {{ saving() ? 'Salvando...' : 'Salvar Latitude' }}
+    </button>
+    @if (saved()) {
+      <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Latitude atualizada ✓</span>
+    }
+  </div>
+</div>
