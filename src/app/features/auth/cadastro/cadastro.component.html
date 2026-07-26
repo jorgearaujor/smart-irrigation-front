@@ -1,0 +1,102 @@
+<div class="flex flex-col gap-6">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight">Novo usuário</h1>
+    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+      Cadastre o acesso de um novo usuário ao painel.
+    </p>
+  </div>
+
+  <div class="max-w-lg rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    @if (error(); as message) {
+      <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-900 dark:bg-red-950/50 dark:text-red-400">
+        {{ message }}
+      </div>
+    }
+
+    @if (success()) {
+      <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-400">
+        Usuário cadastrado com sucesso ✓
+      </div>
+    }
+
+    <form class="flex flex-col gap-4" (ngSubmit)="cadastrar()">
+      <label class="block">
+        <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Nome</span>
+        <input
+          type="text"
+          [ngModel]="nome()"
+          (ngModelChange)="nome.set($event)"
+          name="nome"
+          class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
+        />
+      </label>
+
+      <label class="block">
+        <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">E-mail</span>
+        <input
+          type="email"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          name="email"
+          autocomplete="email"
+          class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
+        />
+      </label>
+
+      <label class="block">
+        <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Senha inicial</span>
+        <input
+          type="password"
+          [ngModel]="senha()"
+          (ngModelChange)="senha.set($event)"
+          name="senha"
+          autocomplete="new-password"
+          class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
+        />
+      </label>
+
+      <label class="block">
+        <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Confirmar senha</span>
+        <input
+          type="password"
+          [ngModel]="confirmar()"
+          (ngModelChange)="confirmar.set($event)"
+          name="confirmar"
+          autocomplete="new-password"
+          class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
+        />
+      </label>
+
+      <label class="block">
+        <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Permissão</span>
+        <select
+          [ngModel]="tipo()"
+          (ngModelChange)="tipo.set($event)"
+          name="tipo"
+          class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
+        >
+          @for (t of tipos; track t) {
+            <option [value]="t">{{ t }}</option>
+          }
+        </select>
+      </label>
+
+      <div class="mt-2 flex items-center gap-3">
+        <button
+          type="submit"
+          [disabled]="submitting()"
+          class="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-slate-700 disabled:opacity-60 dark:bg-emerald-600 dark:hover:bg-emerald-700"
+        >
+          {{ submitting() ? 'Cadastrando...' : 'Cadastrar' }}
+        </button>
+        <button
+          type="button"
+          (click)="voltar()"
+          class="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+        >
+          Voltar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

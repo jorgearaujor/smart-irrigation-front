@@ -7,9 +7,11 @@ import { ConfigIrrigacao } from '../models/config-irrigacao.model';
 import { Telemetry } from '../models/telemetry.model';
 import { IrrigationHistoryRecord } from '../models/irrigation-history.model';
 import { Cultura } from '../models/cultura.model';
+import { Usuario } from '../models/usuario.model';
 
 const deviceBaseUrl = `${environment.apiBaseUrl}/devices/${environment.deviceId}`;
 const culturasUrl = `${environment.apiBaseUrl}/culturas`;
+const usuariosUrl = `${environment.apiBaseUrl}/usuarios`;
 const MOCK_DELAY_MS = 300;
 
 let mockStatus: DeviceStatus = {
@@ -32,6 +34,14 @@ let mockConfig: ConfigIrrigacao = {
   num_gotejadores_planta: 2,
   numero_total_plantas: 120,
   limiar_umidade_minima: 35,
+};
+
+let mockUsuarioAtual: Usuario = {
+  uid: 'mock-uid',
+  nome: 'Usuário de Teste',
+  email: 'teste@example.com',
+  tipo: 'Administrador',
+  urlImg: '',
 };
 
 const mockCulturas: Cultura[] = [
@@ -92,6 +102,15 @@ export const mockApiInterceptor: HttpInterceptorFn = (req, next) => {
 
   if (req.url === culturasUrl && req.method === 'GET') {
     return respond(mockCulturas);
+  }
+
+  if (req.url === `${usuariosUrl}/me` && req.method === 'GET') {
+    return respond(mockUsuarioAtual);
+  }
+
+  if (req.url === usuariosUrl && req.method === 'POST') {
+    const novoUsuario = { ...(req.body as Usuario), uid: `mock-${Date.now()}` };
+    return respond(novoUsuario);
   }
 
   if (!req.url.startsWith(deviceBaseUrl)) {
