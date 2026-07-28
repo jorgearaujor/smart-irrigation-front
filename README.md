@@ -69,6 +69,35 @@ Com `requireAuth: false`, os guards (`authGuard`, `adminGuard`) liberam todas as
 
 **Para reativar**: troque para `requireAuth: true` aqui **e** `DASHBOARD_AUTH_ENABLED=true` no `.env` do backend. Nenhuma outra mudança é necessária.
 
+## Endpoints da API consumidos
+
+Todas as rotas abaixo usam `environment.apiBaseUrl` como base. Quando `requireAuth: true`, o `authInterceptor` anexa `Authorization: Bearer <token>` em todas elas automaticamente.
+
+### `IrrigationService` — `/api/devices/{deviceId}/...`
+
+| Método | Rota | Usado em |
+|---|---|---|
+| GET | `/status` | Polling automático (`statusPollingIntervalMs`) — status ao vivo no Dashboard |
+| GET | `/config-irrigacao` | Carregado ao iniciar o app — parâmetros agronômicos exibidos em Configurações |
+| PUT | `/config-irrigacao` | Configurações → cards "Cultura" e "Parâmetros Agronômicos" |
+| POST | `/irrigation/start` | Dashboard → irrigação manual (liga, com volume em litros) |
+| POST | `/irrigation/stop` | Dashboard → irrigação manual (desliga) |
+| PUT | `/mode` | Dashboard → alternância manual/automático |
+| PUT | `/authorization` | Dashboard → autorização do modo automático |
+| PUT | `/latitude` | Configurações → card "Localização" |
+| GET | `/telemetry` | Histórico (gráficos, por período) + polling (`telemetryPollingIntervalMs`) para a última leitura no Dashboard |
+| GET | `/irrigation-history` | Histórico → tabela de eventos de irrigação |
+
+### Demais rotas
+
+| Método | Rota | Usado em |
+|---|---|---|
+| GET | `/api/culturas` | Configurações → seletor de cultura (preenche os coeficientes Kc por fase) |
+| GET | `/api/usuarios/me` | Carregado logo após o login — perfil do usuário (`nome`, `tipo`/`isAdmin`) |
+| POST | `/api/usuarios` | Cadastro (`/cadastro`) — só aparece/funciona para administradores |
+
+O login em si não passa pelo backend: `signInWithEmailAndPassword` é chamado direto no SDK do Firebase Auth. Só depois disso o front busca `/api/usuarios/me` para descobrir o perfil e a permissão do usuário.
+
 ## Arquitetura
 
 ```
