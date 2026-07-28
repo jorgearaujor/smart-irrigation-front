@@ -39,6 +39,12 @@ testem.log
 /typings
 __screenshots__/
 
+# Variaveis de ambiente (segredos locais - veja .env.example)
+.env
+
+# Gerado por scripts/generate-env.mjs a partir do .env
+src/environments/firebase.config.ts
+
 # System files
 .DS_Store
 Thumbs.db

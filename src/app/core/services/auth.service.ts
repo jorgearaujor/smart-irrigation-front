@@ -9,13 +9,13 @@ import {
   signOut as firebaseSignOut,
 } from 'firebase/auth';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { firebaseConfig } from '../../../environments/firebase.config';
 import { Usuario } from '../models/usuario.model';
 import { UsuarioService } from './usuario.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly auth: Auth = getAuth(initializeApp(environment.firebase));
+  private readonly auth: Auth = getAuth(initializeApp(firebaseConfig));
   private readonly usuarioService = inject(UsuarioService);
   private readonly authReadyPromise: Promise<void>;
   private profileReadyPromise: Promise<void> = Promise.resolve();

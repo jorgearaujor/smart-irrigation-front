@@ -21,12 +21,14 @@ npm install
 npm start        # ng serve — abre em http://localhost:4200
 ```
 
-Por padrão o projeto roda **com dados mockados** (`useMockData: true` em `src/environments/environment.ts`), então dá pra explorar a interface inteira sem precisar do backend rodando. Para usar a API real, edite `environment.ts`:
+Por padrão o projeto roda **com dados mockados** (`useMockData: true` em `src/environments/environment.ts`), então dá pra explorar a interface inteira sem precisar do backend nem do Firebase configurado. Para usar a API real, edite `environment.ts`:
 
 ```ts
 useMockData: false,
 apiBaseUrl: 'http://localhost:8080/api', // endereço do backend
 ```
+
+Para o **login funcionar** (opcional em modo mock, já que `requireAuth` fica `false` por padrão), copie `.env.example` para `.env` e preencha com as credenciais do seu Firebase Web App (Firebase Console > Configurações do projeto > Seus apps). O `.env` não é versionado; `npm start`/`npm run build` geram `src/environments/firebase.config.ts` a partir dele automaticamente (script `scripts/generate-env.mjs`, chamado via `prestart`/`prebuild`). Sem `.env`, esse arquivo é gerado com valores vazios e o app sobe normalmente — só o login que não vai funcionar.
 
 Rodar os testes: `npm test` (Vitest).
 
@@ -135,6 +137,15 @@ Quando `useMockData: true`, esse interceptor intercepta toda chamada à API e re
 | `statusPollingIntervalMs` / `telemetryPollingIntervalMs` | Frequência do polling automático |
 | `useMockData` | `true` = usa dados fake, não depende do backend |
 | `requireAuth` | `true` = exige login pra acessar qualquer tela |
-| `firebase` | Configuração do Firebase Web App (projeto `smart-irrigation-ifmaker`) |
 
-Esse arquivo é único (não há `environment.prod.ts`/`fileReplacements`) e é versionado no Git — as chaves do Firebase aqui são credenciais de client-side (públicas por natureza do Firebase Web SDK), não segredos de servidor.
+Esse arquivo é único (não há `environment.prod.ts`/`fileReplacements`) e é versionado no Git — nenhuma das chaves acima é sensível.
+
+## Firebase (`.env` + `src/environments/firebase.config.ts`)
+
+A configuração do Firebase Web App (projeto `smart-irrigation-ifmaker`) fica fora do `environment.ts` e fora do Git:
+
+1. Copie `.env.example` para `.env` (raiz do projeto) e preencha com os valores do Firebase Console (Configurações do projeto > Seus apps > SDK setup and configuration).
+2. `npm start`, `npm run build`, `npm run watch` e `npm test` rodam `scripts/generate-env.mjs` automaticamente antes (`prestart`/`prebuild`/`prewatch`/`pretest`), que lê o `.env` e gera `src/environments/firebase.config.ts` — esse arquivo é gitignorado, não editar a mão.
+3. Sem `.env`, o script cai para `.env.example` (valores vazios): o app sobe normalmente com dados mockados, só o login que não funciona.
+
+**Sobre a chave (`apiKey`) não ser mais versionada:** o `apiKey` de um Firebase Web App não é um segredo de servidor — ele só identifica o projeto, e por isso o próprio Firebase permite (e documenta) deixá-lo em código client-side; a segurança de verdade vem das Firestore Security Rules e da allowlist em `usuarios/{uid}` que o backend confere a cada request (veja o README do backend). Mesmo assim, tirar do Git evita que ele fique permanentemente no histórico do repositório. Duas ressalvas importantes: (a) como o app roda no navegador, esse valor continua indo parar no bundle compilado de qualquer build publicado — tirar do Git não o esconde de quem inspeciona o site em produção; (b) commits antigos deste repositório (anteriores a este ajuste) ainda têm essa chave no histórico do Git — como o valor nunca foi um segredo de servidor, não há necessidade de rotacioná-la, mas se preferir trocar, gere uma nova Web App no Firebase Console.
