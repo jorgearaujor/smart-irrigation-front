@@ -4,8 +4,8 @@ export const environment = {
   deviceId: 'esp32-01',
   statusPollingIntervalMs: 5000,
   telemetryPollingIntervalMs: 10000,
-  useMockData: true,
+  useMockData: false,
   // Login/cadastro ficam implementados e prontos, mas desligados por enquanto:
   // os guards liberam acesso sem sessão até isso ser reativado (mude para true).
-  requireAuth: false,
+  requireAuth: true,
 };

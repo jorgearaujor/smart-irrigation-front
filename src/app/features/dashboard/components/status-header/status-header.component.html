@@ -20,9 +20,15 @@
       <p class="text-2xl font-bold tracking-tight">
         {{ irrigation.isRunning() ? 'Irrigando agora' : 'Sistema ocioso' }}
       </p>
-      <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
-        Dispositivo monitorado em tempo real
-      </p>
+      @if (irrigation.isRunning() && irrigation.remainingLabel(); as remaining) {
+        <p class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+          Tempo restante estimado: {{ remaining }}
+        </p>
+      } @else {
+        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
+          Dispositivo monitorado em tempo real
+        </p>
+      }
     </div>
   </div>
 

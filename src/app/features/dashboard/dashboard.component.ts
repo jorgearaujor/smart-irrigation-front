@@ -23,7 +23,7 @@ export class DashboardComponent {
   protected readonly changingMode = signal(false);
 
   protected setMode(modo: ModoIrrigacao): void {
-    if (this.changingMode() || this.irrigation.status()?.modo === modo) {
+    if (this.changingMode() || this.irrigation.isRunning() || this.irrigation.status()?.modo === modo) {
       return;
     }
     this.changingMode.set(true);

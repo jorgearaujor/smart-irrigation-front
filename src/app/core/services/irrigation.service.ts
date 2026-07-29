@@ -1,4 +1,4 @@
-import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, Subject, catchError, interval, merge, of, startWith, switchMap, tap } from 'rxjs';
@@ -32,6 +32,30 @@ export class IrrigationService {
   readonly isRunning = computed(() => this.status()?.emExecucao ?? false);
   readonly isAuthorized = computed(() => this.status()?.autorizado ?? false);
 
+  // Duração estimada da irrigação em andamento, a partir do volume atual e da vazão
+  // configurada (mesma conta que o backend/dispositivo usam para calcular o tempo).
+  readonly estimatedDurationSeconds = computed<number | null>(() => {
+    const status = this.status();
+    const config = this.config();
+    if (!status?.emExecucao || !config || !status.quantidadeAgua) {
+      return null;
+    }
+    const vazaoTotalLph = config.vazao_gotejador_lph * config.num_gotejadores_planta * config.numero_total_plantas;
+    return vazaoTotalLph > 0 ? (status.quantidadeAgua / vazaoTotalLph) * 3600 : null;
+  });
+
+  private readonly irrigationStartedAt = signal<number | null>(null);
+  private readonly remainingSeconds = signal<number | null>(null);
+
+  readonly remainingLabel = computed<string | null>(() => {
+    const seconds = this.remainingSeconds();
+    if (seconds === null) {
+      return null;
+    }
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes}:${(seconds % 60).toString().padStart(2, '0')}`;
+  });
+
   constructor() {
     merge(interval(environment.statusPollingIntervalMs), this.statusRefresh$)
       .pipe(
@@ -49,7 +73,35 @@ export class IrrigationService {
       )
       .subscribe();
 
+    // Marca o instante em que a irrigação em andamento foi percebida pelo front, pra
+    // poder mostrar uma contagem regressiva (o backend não expõe um "iniciado em").
+    effect(() => {
+      if (this.isRunning()) {
+        if (this.irrigationStartedAt() === null) {
+          this.irrigationStartedAt.set(Date.now());
+        }
+      } else {
+        this.irrigationStartedAt.set(null);
+        this.remainingSeconds.set(null);
+      }
+    });
+
+    interval(1000)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.tickRemaining());
+
     this.loadConfig();
+  }
+
+  private tickRemaining(): void {
+    const startedAt = this.irrigationStartedAt();
+    const totalSeconds = this.estimatedDurationSeconds();
+    if (startedAt === null || totalSeconds === null) {
+      this.remainingSeconds.set(null);
+      return;
+    }
+    const elapsedSeconds = (Date.now() - startedAt) / 1000;
+    this.remainingSeconds.set(Math.max(0, Math.round(totalSeconds - elapsedSeconds)));
   }
 
   refreshStatus(): void {
