@@ -163,6 +163,10 @@ export class IrrigationService {
     return this.http.get<Cultura[]>(`${environment.apiBaseUrl}/culturas`);
   }
 
+  criarCultura(cultura: Cultura): Observable<Cultura> {
+    return this.http.post<Cultura>(`${environment.apiBaseUrl}/culturas`, cultura);
+  }
+
   getTelemetryHistory(from: Date, to: Date, limit = 1000): Observable<Telemetry[]> {
     const params = new HttpParams()
       .set('from', from.toISOString())

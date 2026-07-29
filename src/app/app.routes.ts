@@ -21,6 +21,13 @@ export const routes: Routes = [
     title: 'SmartIrrigation · Cadastro',
   },
   {
+    path: 'culturas/nova',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () =>
+      import('./features/culturas/nova/nova-cultura.component').then((m) => m.NovaCulturaComponent),
+    title: 'SmartIrrigation · Nova cultura',
+  },
+  {
     path: 'dashboard',
     canActivate: [authGuard],
     loadComponent: () =>
