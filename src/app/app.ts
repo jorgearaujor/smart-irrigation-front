@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { AuthService } from './core/services/auth.service';
+import { ThemeService } from './core/services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,7 @@ import { AuthService } from './core/services/auth.service';
 })
 export class App {
   protected readonly auth = inject(AuthService);
+  protected readonly theme = inject(ThemeService);
   private readonly router = inject(Router);
 
   protected readonly navItems = [

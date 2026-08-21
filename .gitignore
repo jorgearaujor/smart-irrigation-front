@@ -44,6 +44,7 @@ __screenshots__/
 
 # Gerado por scripts/generate-env.mjs a partir do .env
 src/environments/firebase.config.ts
+src/environments/runtime-flags.ts
 
 # System files
 .DS_Store

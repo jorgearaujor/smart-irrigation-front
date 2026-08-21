@@ -1,6 +1,10 @@
 #!/usr/bin/env node
-// Le o .env (nao versionado) e gera src/environments/firebase.config.ts.
-// Sem .env, cai para .env.example (login nao funciona, mas o app sobe com dados mockados).
+// Le variaveis de ambiente (nesta ordem de prioridade: variaveis reais do processo/host,
+// como as configuradas na Vercel > .env local, nao versionado > .env.example) e gera:
+//  - src/environments/firebase.config.ts
+//  - src/environments/runtime-flags.ts
+// Sem nenhuma fonte configurada, cai para os defaults abaixo (login nao funciona,
+// mas o app sobe com dados mockados).
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -8,9 +12,10 @@ import { fileURLToPath } from 'node:url';
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const envPath = resolve(rootDir, '.env');
 const envExamplePath = resolve(rootDir, '.env.example');
-const outPath = resolve(rootDir, 'src/environments/firebase.config.ts');
+const firebaseOutPath = resolve(rootDir, 'src/environments/firebase.config.ts');
+const runtimeFlagsOutPath = resolve(rootDir, 'src/environments/runtime-flags.ts');
 
-const REQUIRED_KEYS = [
+const FIREBASE_KEYS = [
   'FIREBASE_API_KEY',
   'FIREBASE_AUTH_DOMAIN',
   'FIREBASE_PROJECT_ID',
@@ -19,6 +24,12 @@ const REQUIRED_KEYS = [
   'FIREBASE_APP_ID',
   'FIREBASE_MEASUREMENT_ID',
 ];
+
+const DEFAULTS = {
+  USE_MOCK_DATA: 'false',
+  REQUIRE_AUTH: 'true',
+  API_BASE_URL: 'http://localhost:8080/api',
+};
 
 function parseEnvFile(path) {
   if (!existsSync(path)) return null;
@@ -38,36 +49,56 @@ function parseEnvFile(path) {
   return vars;
 }
 
-let vars = parseEnvFile(envPath);
-let source = '.env';
-if (!vars) {
+const exampleVars = parseEnvFile(envExamplePath) ?? {};
+const localVars = parseEnvFile(envPath);
+
+function readVar(key) {
+  if (process.env[key] !== undefined && process.env[key] !== '') return process.env[key];
+  if (localVars && localVars[key] !== undefined && localVars[key] !== '') return localVars[key];
+  if (exampleVars[key] !== undefined && exampleVars[key] !== '') return exampleVars[key];
+  return DEFAULTS[key] ?? '';
+}
+
+const source = process.env.VERCEL
+  ? 'variaveis de ambiente da Vercel'
+  : localVars
+    ? '.env'
+    : '.env.example';
+
+const missingFirebase = FIREBASE_KEYS.filter((key) => !readVar(key));
+if (missingFirebase.length > 0) {
   console.warn(
-    '[generate-env] .env nao encontrado na raiz do projeto — usando .env.example (login com Firebase nao vai funcionar).\n' +
-      '[generate-env] Copie .env.example para .env e preencha com as credenciais reais do Firebase Web App.',
+    `[generate-env] Variaveis do Firebase ausentes (${source}): ${missingFirebase.join(', ')} — login nao vai funcionar.`,
   );
-  vars = parseEnvFile(envExamplePath) ?? {};
-  source = '.env.example';
 }
 
-const missing = REQUIRED_KEYS.filter((key) => !vars[key]);
-if (missing.length > 0) {
-  console.warn(`[generate-env] Variaveis vazias em ${source}: ${missing.join(', ')}`);
-}
+const firebaseConfig = Object.fromEntries(FIREBASE_KEYS.map((key) => [key, readVar(key)]));
 
-const config = Object.fromEntries(REQUIRED_KEYS.map((key) => [key, vars[key] ?? '']));
-
-const fileContent = `// Arquivo GERADO por scripts/generate-env.mjs a partir do .env — nao editar a mao, nao commitar.
+const firebaseFileContent = `// Arquivo GERADO por scripts/generate-env.mjs a partir do .env — nao editar a mao, nao commitar.
 export const firebaseConfig = {
-  apiKey: '${config.FIREBASE_API_KEY}',
-  authDomain: '${config.FIREBASE_AUTH_DOMAIN}',
-  projectId: '${config.FIREBASE_PROJECT_ID}',
-  storageBucket: '${config.FIREBASE_STORAGE_BUCKET}',
-  messagingSenderId: '${config.FIREBASE_MESSAGING_SENDER_ID}',
-  appId: '${config.FIREBASE_APP_ID}',
-  measurementId: '${config.FIREBASE_MEASUREMENT_ID}',
+  apiKey: '${firebaseConfig.FIREBASE_API_KEY}',
+  authDomain: '${firebaseConfig.FIREBASE_AUTH_DOMAIN}',
+  projectId: '${firebaseConfig.FIREBASE_PROJECT_ID}',
+  storageBucket: '${firebaseConfig.FIREBASE_STORAGE_BUCKET}',
+  messagingSenderId: '${firebaseConfig.FIREBASE_MESSAGING_SENDER_ID}',
+  appId: '${firebaseConfig.FIREBASE_APP_ID}',
+  measurementId: '${firebaseConfig.FIREBASE_MEASUREMENT_ID}',
 };
 `;
 
-mkdirSync(dirname(outPath), { recursive: true });
-writeFileSync(outPath, fileContent, 'utf8');
-console.log(`[generate-env] src/environments/firebase.config.ts gerado a partir de ${source}.`);
+const useMockData = readVar('USE_MOCK_DATA').toLowerCase() === 'true';
+const requireAuth = readVar('REQUIRE_AUTH').toLowerCase() === 'true';
+const apiBaseUrl = readVar('API_BASE_URL');
+
+const runtimeFlagsFileContent = `// Arquivo GERADO por scripts/generate-env.mjs a partir do .env — nao editar a mao, nao commitar.
+export const runtimeFlags = {
+  useMockData: ${useMockData},
+  requireAuth: ${requireAuth},
+  apiBaseUrl: '${apiBaseUrl}',
+};
+`;
+
+mkdirSync(dirname(firebaseOutPath), { recursive: true });
+writeFileSync(firebaseOutPath, firebaseFileContent, 'utf8');
+writeFileSync(runtimeFlagsOutPath, runtimeFlagsFileContent, 'utf8');
+console.log(`[generate-env] firebase.config.ts e runtime-flags.ts gerados (fonte: ${source}).`);
