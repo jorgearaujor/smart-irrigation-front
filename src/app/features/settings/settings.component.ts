@@ -4,7 +4,6 @@ import { AgronomicParamsCardComponent } from '../dashboard/components/agronomic-
 import { LocationCardComponent } from './components/location-card/location-card.component';
 import { CultureCardComponent } from './components/culture-card/culture-card.component';
 import { AuthService } from '../../core/services/auth.service';
-import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-settings',
@@ -15,6 +14,6 @@ export class SettingsComponent {
   protected readonly auth = inject(AuthService);
 
   protected canManageUsuarios(): boolean {
-    return !environment.requireAuth || this.auth.isAdmin();
+    return this.auth.canEdit();
   }
 }

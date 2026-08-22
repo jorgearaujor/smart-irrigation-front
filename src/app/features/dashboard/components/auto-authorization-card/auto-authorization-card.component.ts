@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { IrrigationService } from '../../../../core/services/irrigation.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-auto-authorization-card',
@@ -8,10 +9,11 @@ import { IrrigationService } from '../../../../core/services/irrigation.service'
 })
 export class AutoAuthorizationCardComponent {
   protected readonly irrigation = inject(IrrigationService);
+  protected readonly auth = inject(AuthService);
   protected readonly submitting = signal(false);
 
   protected toggleAuthorization(): void {
-    if (this.submitting()) {
+    if (this.submitting() || !this.auth.canEdit()) {
       return;
     }
     this.submitting.set(true);

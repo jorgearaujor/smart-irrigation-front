@@ -18,7 +18,9 @@
   <button
     type="button"
     (click)="toggleAuthorization()"
-    [disabled]="submitting()"
+    [disabled]="submitting() || !auth.canEdit()"
+    [class.permission-disabled]="!auth.canEdit()"
+    [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
     [class]="
       irrigation.isAuthorized()
         ? 'mt-5 w-full rounded-xl border-2 border-emerald-600 px-4 py-3 text-base font-bold text-emerald-700 transition hover:bg-emerald-50 disabled:opacity-60 dark:text-emerald-400 dark:hover:bg-emerald-950/40'
@@ -27,4 +29,7 @@
   >
     {{ irrigation.isAuthorized() ? 'Desativar Irrigação Automática' : 'Autorizar Irrigação Automática' }}
   </button>
+  @if (!auth.canEdit()) {
+    <p class="mt-3 text-xs font-medium text-slate-500 dark:text-slate-400">Apenas administradores podem alterar a autorização.</p>
+  }
 </div>

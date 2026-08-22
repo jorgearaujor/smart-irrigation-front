@@ -11,6 +11,9 @@
         <select
           [ngModel]="f.cultura"
           (ngModelChange)="updateField('cultura', $event)"
+          [disabled]="!auth.canEdit()"
+          [class.permission-disabled]="!auth.canEdit()"
+          [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
           class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
         >
           @for (cultura of culturas(); track cultura.nome) {
@@ -24,6 +27,9 @@
         <select
           [ngModel]="f.faseCrescimento"
           (ngModelChange)="updateField('faseCrescimento', $event)"
+          [disabled]="!auth.canEdit()"
+          [class.permission-disabled]="!auth.canEdit()"
+          [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
           class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
         >
           @for (fase of fases; track fase) {
@@ -44,13 +50,18 @@
       <button
         type="button"
         (click)="save()"
-        [disabled]="saving()"
+        [disabled]="saving() || !auth.canEdit()"
+        [class.permission-disabled]="!auth.canEdit()"
+        [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
         class="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-slate-700 disabled:opacity-60 dark:bg-emerald-600 dark:hover:bg-emerald-700"
       >
         {{ saving() ? 'Salvando...' : 'Salvar Cultura' }}
       </button>
       @if (saved()) {
         <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Cultura atualizada ✓</span>
+      }
+      @if (!auth.canEdit()) {
+        <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Apenas administradores podem alterar</span>
       }
     </div>
   } @else {

@@ -3,3 +3,10 @@
 @import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* Aparência distinta para controles desabilitados por falta de permissão (perfil Visualizador) */
+.permission-disabled {
+  cursor: not-allowed;
+  filter: grayscale(1);
+  opacity: 0.5;
+}

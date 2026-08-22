@@ -8,7 +8,9 @@
     <button
       type="button"
       (click)="volumeLitros.set(Math.max(0, volumeLitros() - 1))"
-      [disabled]="irrigation.isRunning()"
+      [disabled]="irrigation.isRunning() || !auth.canEdit()"
+      [class.permission-disabled]="!auth.canEdit()"
+      [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
       class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-lg font-bold text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
       aria-label="Diminuir volume"
     >
@@ -23,7 +25,9 @@
     <button
       type="button"
       (click)="volumeLitros.set(Math.min(100, volumeLitros() + 1))"
-      [disabled]="irrigation.isRunning()"
+      [disabled]="irrigation.isRunning() || !auth.canEdit()"
+      [class.permission-disabled]="!auth.canEdit()"
+      [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
       class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-lg font-bold text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
       aria-label="Aumentar volume"
     >
@@ -37,7 +41,9 @@
     max="100"
     [ngModel]="volumeLitros()"
     (ngModelChange)="volumeLitros.set($event)"
-    [disabled]="irrigation.isRunning()"
+    [disabled]="irrigation.isRunning() || !auth.canEdit()"
+    [class.permission-disabled]="!auth.canEdit()"
+    [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
     class="mt-5 w-full accent-emerald-600 disabled:opacity-40"
     aria-label="Volume de água em litros"
   />
@@ -46,7 +52,9 @@
     <button
       type="button"
       (click)="stop()"
-      [disabled]="submitting()"
+      [disabled]="submitting() || !auth.canEdit()"
+      [class.permission-disabled]="!auth.canEdit()"
+      [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
       class="mt-5 w-full rounded-xl bg-red-600 px-4 py-3 text-base font-bold text-white shadow-sm transition hover:bg-red-700 disabled:opacity-60"
     >
       Parar Irrigação
@@ -55,10 +63,15 @@
     <button
       type="button"
       (click)="start()"
-      [disabled]="volumeLitros() <= 0 || submitting()"
+      [disabled]="volumeLitros() <= 0 || submitting() || !auth.canEdit()"
+      [class.permission-disabled]="!auth.canEdit()"
+      [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
       class="mt-5 w-full rounded-xl bg-emerald-600 px-4 py-3 text-base font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
     >
       Iniciar Irrigação
     </button>
+  }
+  @if (!auth.canEdit()) {
+    <p class="mt-3 text-xs font-medium text-slate-500 dark:text-slate-400">Apenas administradores podem controlar a irrigação.</p>
   }
 </div>

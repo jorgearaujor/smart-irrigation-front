@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { IrrigationService } from '../../core/services/irrigation.service';
+import { AuthService } from '../../core/services/auth.service';
 import { ModoIrrigacao } from '../../core/models/device-status.model';
 import { StatusHeaderComponent } from './components/status-header/status-header.component';
 import { SensorSnapshotCardComponent } from './components/sensor-snapshot-card/sensor-snapshot-card.component';
@@ -20,10 +21,16 @@ import { LastIrrigationCardComponent } from './components/last-irrigation-card/l
 })
 export class DashboardComponent {
   protected readonly irrigation = inject(IrrigationService);
+  protected readonly auth = inject(AuthService);
   protected readonly changingMode = signal(false);
 
   protected setMode(modo: ModoIrrigacao): void {
-    if (this.changingMode() || this.irrigation.isRunning() || this.irrigation.status()?.modo === modo) {
+    if (
+      this.changingMode() ||
+      this.irrigation.isRunning() ||
+      this.irrigation.status()?.modo === modo ||
+      !this.auth.canEdit()
+    ) {
       return;
     }
     this.changingMode.set(true);

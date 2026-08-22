@@ -9,6 +9,7 @@ import {
   signOut as firebaseSignOut,
 } from 'firebase/auth';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { firebaseConfig } from '../../../environments/firebase.config';
 import { Usuario } from '../models/usuario.model';
 import { UsuarioService } from './usuario.service';
@@ -24,6 +25,8 @@ export class AuthService {
   readonly profile = signal<Usuario | null>(null);
   readonly isAuthenticated = computed(() => this.user() !== null);
   readonly isAdmin = computed(() => this.profile()?.tipo === 'Administrador');
+  // Visualizador só pode ler dados; qualquer ação de escrita exige perfil Administrador.
+  readonly canEdit = computed(() => !environment.requireAuth || this.isAdmin());
 
   constructor() {
     let resolveAuthReady!: () => void;

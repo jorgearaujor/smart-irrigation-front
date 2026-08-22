@@ -1,6 +1,7 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IrrigationService } from '../../../../core/services/irrigation.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-location-card',
@@ -9,6 +10,7 @@ import { IrrigationService } from '../../../../core/services/irrigation.service'
 })
 export class LocationCardComponent {
   protected readonly irrigation = inject(IrrigationService);
+  protected readonly auth = inject(AuthService);
 
   protected readonly latitude = signal<number | null>(null);
   protected readonly saving = signal(false);
@@ -29,7 +31,7 @@ export class LocationCardComponent {
 
   protected save(): void {
     const latitude = this.latitude();
-    if (latitude === null || this.saving()) {
+    if (latitude === null || this.saving() || !this.auth.canEdit()) {
       return;
     }
     this.saving.set(true);

@@ -6,8 +6,15 @@
       <button
         type="button"
         (click)="setMode('manual')"
-        [disabled]="changingMode() || irrigation.isRunning()"
-        [title]="irrigation.isRunning() ? 'Não é possível trocar o modo enquanto está irrigando' : ''"
+        [disabled]="changingMode() || irrigation.isRunning() || !auth.canEdit()"
+        [class.permission-disabled]="!auth.canEdit()"
+        [title]="
+          !auth.canEdit()
+            ? 'Apenas administradores podem alterar'
+            : irrigation.isRunning()
+              ? 'Não é possível trocar o modo enquanto está irrigando'
+              : ''
+        "
         [class]="
           irrigation.isManual()
             ? 'flex-1 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm disabled:opacity-60 disabled:cursor-not-allowed sm:flex-none'
@@ -19,8 +26,15 @@
       <button
         type="button"
         (click)="setMode('automatico')"
-        [disabled]="changingMode() || irrigation.isRunning()"
-        [title]="irrigation.isRunning() ? 'Não é possível trocar o modo enquanto está irrigando' : ''"
+        [disabled]="changingMode() || irrigation.isRunning() || !auth.canEdit()"
+        [class.permission-disabled]="!auth.canEdit()"
+        [title]="
+          !auth.canEdit()
+            ? 'Apenas administradores podem alterar'
+            : irrigation.isRunning()
+              ? 'Não é possível trocar o modo enquanto está irrigando'
+              : ''
+        "
         [class]="
           !irrigation.isManual()
             ? 'flex-1 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm disabled:opacity-60 disabled:cursor-not-allowed sm:flex-none'
@@ -33,6 +47,10 @@
     @if (irrigation.isRunning()) {
       <p class="px-1 text-xs font-medium text-slate-500 dark:text-slate-400">
         Espere a irrigação terminar para trocar o modo.
+      </p>
+    } @else if (!auth.canEdit()) {
+      <p class="px-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+        Apenas administradores podem trocar o modo de irrigação.
       </p>
     }
   </div>

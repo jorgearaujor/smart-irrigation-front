@@ -13,6 +13,9 @@
           step="1"
           [ngModel]="f.limiar_umidade_minima"
           (ngModelChange)="updateField('limiar_umidade_minima', $event)"
+          [disabled]="!auth.canEdit()"
+          [class.permission-disabled]="!auth.canEdit()"
+          [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
           class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
         />
       </label>
@@ -24,6 +27,9 @@
           step="0.01"
           [ngModel]="f.espacamento_plantas_m"
           (ngModelChange)="updateField('espacamento_plantas_m', $event)"
+          [disabled]="!auth.canEdit()"
+          [class.permission-disabled]="!auth.canEdit()"
+          [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
           class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
         />
       </label>
@@ -35,6 +41,9 @@
           step="0.01"
           [ngModel]="f.espacamento_linhas_m"
           (ngModelChange)="updateField('espacamento_linhas_m', $event)"
+          [disabled]="!auth.canEdit()"
+          [class.permission-disabled]="!auth.canEdit()"
+          [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
           class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
         />
       </label>
@@ -46,6 +55,9 @@
           step="0.1"
           [ngModel]="f.vazao_gotejador_lph"
           (ngModelChange)="updateField('vazao_gotejador_lph', $event)"
+          [disabled]="!auth.canEdit()"
+          [class.permission-disabled]="!auth.canEdit()"
+          [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
           class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
         />
       </label>
@@ -57,6 +69,9 @@
           step="1"
           [ngModel]="f.num_gotejadores_planta"
           (ngModelChange)="updateField('num_gotejadores_planta', $event)"
+          [disabled]="!auth.canEdit()"
+          [class.permission-disabled]="!auth.canEdit()"
+          [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
           class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
         />
       </label>
@@ -68,6 +83,9 @@
           step="1"
           [ngModel]="f.numero_total_plantas"
           (ngModelChange)="updateField('numero_total_plantas', $event)"
+          [disabled]="!auth.canEdit()"
+          [class.permission-disabled]="!auth.canEdit()"
+          [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
           class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800"
         />
       </label>
@@ -77,13 +95,18 @@
       <button
         type="button"
         (click)="save()"
-        [disabled]="saving()"
+        [disabled]="saving() || !auth.canEdit()"
+        [class.permission-disabled]="!auth.canEdit()"
+        [title]="!auth.canEdit() ? 'Apenas administradores podem alterar' : ''"
         class="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-slate-700 disabled:opacity-60 dark:bg-emerald-600 dark:hover:bg-emerald-700"
       >
         {{ saving() ? 'Salvando...' : 'Salvar Parâmetros' }}
       </button>
       @if (saved()) {
         <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Parâmetros atualizados ✓</span>
+      }
+      @if (!auth.canEdit()) {
+        <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Apenas administradores podem alterar</span>
       }
     </div>
   } @else {

@@ -1,6 +1,7 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IrrigationService } from '../../../../core/services/irrigation.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { ConfigIrrigacao, FaseCrescimento } from '../../../../core/models/config-irrigacao.model';
 import { Cultura } from '../../../../core/models/cultura.model';
 
@@ -11,6 +12,7 @@ import { Cultura } from '../../../../core/models/cultura.model';
 })
 export class CultureCardComponent {
   protected readonly irrigation = inject(IrrigationService);
+  protected readonly auth = inject(AuthService);
 
   protected readonly form = signal<ConfigIrrigacao | null>(null);
   protected readonly culturas = signal<Cultura[]>([]);
@@ -49,7 +51,7 @@ export class CultureCardComponent {
 
   protected save(): void {
     const current = this.form();
-    if (!current || this.saving()) {
+    if (!current || this.saving() || !this.auth.canEdit()) {
       return;
     }
     this.saving.set(true);
