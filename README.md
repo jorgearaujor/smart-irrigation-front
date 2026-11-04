@@ -56,7 +56,7 @@ flowchart LR
     WEB[Painel web<br/>este repositório]
     MOB[App Android]
 
-    ESP -- "ingestão: telemetria, status, histórico<br/>(X-Device-Key)" --> API
+    ESP -- "telemetria, status, histórico<br/>(X-Device-Key)" --> API
     ESP -- "long-polling de comandos" --> API
     WEB -- "REST + Bearer token" --> API
     MOB -- "REST + Bearer token" --> API
@@ -65,11 +65,11 @@ flowchart LR
 
 ### Como os dados circulam
 
-1. **Leitura no campo.** A cada 10 s o coletor lê temperatura, umidade do ar e umidade do solo e envia para a API (`POST /api/ingest/telemetry`). A cada 20 s ele também envia o próprio status: modo, autorização, se está irrigando, latitude etc. (`POST /api/ingest/status`).
+1. **Leitura no campo.** A cada 10 s o coletor lê temperatura, umidade do ar e umidade do solo e envia para a API (`POST /api/devices/{id}/telemetry`). A cada 20 s ele também envia o próprio status: modo, autorização, se está irrigando, latitude etc. (`POST /api/devices/{id}/status`).
 2. **Armazenamento.** A API grava tudo no Firestore: o status atual em `devices/{id}`, as leituras em `devices/{id}/telemetry` e as irrigações em `devices/{id}/irrigationHistory`.
 3. **Visualização.** O painel consulta a API em intervalos regulares (status a cada 5 s, telemetria a cada 10 s) e atualiza a tela sozinho.
 4. **Comandos.** Quando o usuário faz uma ação no painel (por exemplo "irrigar 20 L"), a API **coloca um comando na fila**. O coletor não recebe chamadas de fora: ele fica perguntando à API por novos comandos (*long-polling* em `GET /api/devices/{id}/commands/poll`, com espera de até 30 s). Quando chega um comando, ele executa e devolve o status atualizado.
-5. **Histórico.** Ao fim de cada irrigação, manual ou automática, o coletor envia um registro com duração, volume, umidade antes da rega e modo (`POST /api/ingest/history`). Esse registro aparece na tela de Histórico.
+5. **Histórico.** Ao fim de cada irrigação, manual ou automática, o coletor envia um registro com duração, volume, umidade antes da rega e modo (`POST /api/devices/{id}/irrigation-history`). Esse registro aparece na tela de Histórico.
 
 ---
 
@@ -332,7 +332,7 @@ Todas as rotas usam `API_BASE_URL` como base. Com `REQUIRE_AUTH=true`, o `authIn
 
 O login em si não passa pela API: ele é feito direto no Firebase Auth (`signInWithEmailAndPassword`).
 
-Os endpoints que o coletor usa (`/ingest/**`, `/devices/{id}/config` e `/devices/{id}/commands/poll`) estão descritos no [README da API](https://github.com/jorgearaujor/smart-irrigation-api).
+Os endpoints que o coletor usa (`POST /devices/{id}/telemetry`, `/status` e `/irrigation-history`, além de `GET /devices/{id}/config` e `/commands/poll`) estão descritos no [README da API](https://github.com/jorgearaujor/smart-irrigation-api).
 
 ## Arquitetura do código
 
